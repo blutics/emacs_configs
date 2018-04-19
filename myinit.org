@@ -26,79 +26,95 @@
 #+END_SRC
 
    #+RESULTS:
-   
+** size/position
+#+BEGIN_SRC emacs-lisp
+  ;;; startup frame size and position 
+  (add-to-list 'default-frame-alist '(left . 800))
+  (add-to-list 'default-frame-alist '(top . 20))
+  (add-to-list 'default-frame-alist '(height . 30))
+  (add-to-list 'default-frame-alist '(width . 80))
+#+END_SRC
+** font
+#+BEGIN_SRC emacs-lisp
+  (set-face-attribute 'default nil :height 110 :font "Office Code Pro")
+  (set-fontset-font t 'hangul (font-spec :name "NanumGothicCoding"))
+
+  ;;;(set-language-environment "UTF-8")
+  ;;;(set-default-coding-systems 'utf-8)
+
+  ;;;(set-fontset-font "fontset-default" '(#x1100 . #xffdc) '("MunanCoding" . "iso10646-1"))
+  ;;;(setq face-font-rescale-alist '((".*MunanCoding.*" . 1.1)))
+
+#+END_SRC
+** window size control
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "S-C-<left>") 'shrink-window-horizontally)
+  (global-set-key (kbd "S-C-<right>") 'enlarge-window-horizontally)
+  (global-set-key (kbd "S-C-<down>") 'shrink-window)
+  (global-set-key (kbd "S-C-<up>") 'enlarge-window)
+#+END_SRC
+** buffer-related
+#+BEGIN_SRC emacs-lisp
+  (defalias 'list-buffers 'ibuffer)
+  (global-set-key (kbd "C-x b") 'ibuffer)
+  (eval-after-load "Emacs-Lisp"
+    (define-key emacs-lisp-mode-map (kbd "C-c C-b") 'eval-buffer))
+#+END_SRC
 ** general
 #+BEGIN_SRC emacs-lisp
-    (fset 'yes-or-no-p 'y-or-n-p)
-    (setq ido-enable-flex-matching t)
-    (setq ido-everywhere t)
-    (ido-mode 1)
-    (find-file-noselect "~/.emacs.d/myinit.org")
-    (electric-pair-mode)
+  (fset 'yes-or-no-p 'y-or-n-p)
+  (setq ido-enable-flex-matching t)
+  (setq ido-everywhere t)
+  (ido-mode 1)
+  (find-file-noselect "~/.emacs.d/myinit.org")
+  (electric-pair-mode)
+  (use-package flx-ido
+    :ensure t)
+  (flx-ido-mode 1)
+  (setq ido-use-faces nil)
 
-    (defalias 'list-buffers 'ibuffer)
+  (require 'all-the-icons)
 
-    (global-linum-mode 1)
-    (setq linum-format "%5d ")
-    (global-hl-line-mode)
+  (setq linum-format "%5d ")
+  (global-hl-line-mode)
 
-    ;;backup directory
+  (global-set-key (kbd "C-M-k") 'paredit-kill)
+  (global-set-key (kbd "C-x p") 'package-list-packages)
+  (global-set-key (kbd "C-=") 'linum-mode)
 
-    (set-face-attribute 'default nil :height 100)
-    (set-fontset-font t 'hangul (font-spec :name "NanumGothicCoding"))
-
-    (global-set-key (kbd "S-C-<left>") 'shrink-window-horizontally)
-    (global-set-key (kbd "S-C-<right>") 'enlarge-window-horizontally)
-    (global-set-key (kbd "S-C-<down>") 'shrink-window)
-    (global-set-key (kbd "S-C-<up>") 'enlarge-window)
-    (global-set-key (kbd "C-x b") 'ibuffer)
-
-    (global-set-key (kbd "C-x p") 'package-list-packages)
-
-    (eval-after-load "Emacs-Lisp"
-      (define-key emacs-lisp-mode-map (kbd "C-c C-b") 'eval-buffer))
-
-    (set-fontset-font "fontset-default" '(#x1100 . #xffdc) '("MunanCoding" . "iso10646-1"))
-    ;;;(setq face-font-rescale-alist '((".*MunanCoding.*" . 1.1)))
-
-    (use-package hungry-delete
-      :ensure t
-      :config
-      (global-hungry-delete-mode))
-    (use-package beacon
-      :ensure t
-      :config
-      (beacon-mode 1)
-      (setq beacon-color "#666600")
-      )
-    (use-package paredit
-      :ensure t)
+  (use-package expand-region
+    :ensure t)
+  (global-set-key (kbd "C-q") 'er/expand-region)
+  (use-package hungry-delete
+    :ensure t
+    :config
+    (global-hungry-delete-mode))
+  (use-package beacon
+    :ensure t
+    :config
+    (beacon-mode 1)
+    (setq beacon-color "#666600")
+    )
+  (use-package paredit
+    :ensure t)
+  (global-set-key (kbd "C-c b") 'switch-to-prev-buffer)
+  ;;;(setq visible-bell 1)
+  (setq ring-bell-function 'ignore)
   #+END_SRC
 
 #+RESULTS:
 =t
 ==t
 =   
-** ibuffer
-#+BEGIN_SRC emacs-lisp
-  (setq ibuffer-saved-filter-groups
-            '(("home"
-               ("emacs-config" (or (filename . ".emacs.d")
-                                   (filename . "emacs-config")))
-               ("org" (or (mode . org-mode)
-                          (filename . "OrgMode")))
-               ("help" (or (name . "\*Help\*"))))))
-      (add-hook 'ibuffer-mode-hook
-                '(lambda()
-                   (ibuffer-switch-to-saved-filter-groups "home")))
-#+END_SRC
-
-   #+RESULTS:
-   | lambda | nil | (ibuffer-switch-to-saved-filter-groups home) |
 ** for Windows Setting
 #+BEGIN_SRC emacs-lisp
-  (set-language-environment "Korean")
-  (prefer-coding-system 'utf-8)
+  (cond
+   ((string-equal system-type "windows-nt") ; Microsoft Windows
+    (progn
+      (set-language-environment "Korean")
+      (prefer-coding-system 'utf-8)
+      (setq exec-path (append exec-path '("C:/Program Files/Racket/")))
+      (setq exec-path (append exec-path '("C:/emacs-25.3_1-x86_64/bin/"))))))
 #+END_SRC
 
 #+RESULTS:
@@ -109,6 +125,9 @@
   (use-package try
     :ensure t)
 #+END_SRC
+
+#+RESULTS:
+
 ** which-key
 #+BEGIN_SRC emacs-lisp
   (use-package which-key
@@ -182,23 +201,44 @@
     :ensure t
     :init
     (global-flycheck-mode))
-
+  (setq flycheck-indication-mode nil)
 #+END_SRC
 
    #+RESULTS:
 ** neotree
 #+BEGIN_SRC emacs-lisp
-    (use-package neotree
-      :ensure t)
-    (setq neo-theme 'icons)
+  (use-package neotree
+    :ensure t)
+  (setq neo-theme 'icons)
   ;;;(setq neo-theme (if window-system 'icons 'arrow))
-  (global-set-key (kbd "C-x -") 'neotree-toggle)
+  (global-set-key (kbd "C-x -") 'neotree-project-dir-toggle)
   (setq inhibit-compacting-font-caches t)
 
   ;;;get rid of linum in NeoTree
   (defun my/neotree-hook (_unused)
     (linum-mode -1))
   (add-hook 'neo-after-create-hook 'my/neotree-hook)
+  (defun neotree-project-dir-toggle ()
+    "Open NeoTree using the project root, using find-file-in-project,
+    or the current buffer directory."
+    (interactive)
+    (let ((project-dir
+	   (ignore-errors
+	       ;;; Pick one: projectile or find-file-in-project
+					  ; (projectile-project-root)
+	     (ffip-project-root)
+	     ))
+	  (file-name (buffer-file-name))
+	  (neo-smart-open t))
+      (if (and (fboundp 'neo-global--window-exists-p)
+	       (neo-global--window-exists-p))
+	  (neotree-hide)
+	(progn
+	  (neotree-show)
+	  (if project-dir
+	      (neotree-dir project-dir))
+	  (if file-name
+	      (neotree-find file-name))))))
    #+END_SRC
 
    #+RESULTS:
@@ -237,7 +277,7 @@
      :ensure t)
 
    (defhydra hydra-buffer-menu (:color pink
-                                :hint nil)
+				:hint nil)
      "
    ^Mark^             ^Unmark^           ^Actions^          ^Search
    ^^^^^^^^-----------------------------------------------------------------                        (__)
@@ -270,10 +310,10 @@
 
    (defun org-agenda-cts ()
      (and (eq major-mode 'org-agenda-mode)
-          (let ((args (get-text-property
-                       (min (1- (point-max)) (point))
-                       'org-last-args)))
-            (nth 2 args))))
+	  (let ((args (get-text-property
+		       (min (1- (point-max)) (point))
+		       'org-last-args)))
+	    (nth 2 args))))
 
    (defhydra hydra-org-agenda-view (:hint none)
      "
@@ -300,9 +340,9 @@
      ("D" org-agenda-toggle-diary (format "% -3S" org-agenda-include-diary))
      ("!" org-agenda-toggle-deadlines)
      ("[" (let ((org-agenda-include-inactive-timestamps t))
-            (org-agenda-check-type t 'timeline 'agenda)
-            (org-agenda-redo)
-            (message "Display now includes inactive timestamps as well")))
+	    (org-agenda-check-type t 'timeline 'agenda)
+	    (org-agenda-redo)
+	    (message "Display now includes inactive timestamps as well")))
      ("q" (message "Abort") :exit t)
      ("." nil))
 
@@ -348,26 +388,26 @@
    structure element. HEADER string includes more parameters that are
    prepended to the element after the #+HEADER: tag."
        (let (text)
-         (when (region-active-p)
-           (setq text (buffer-substring (region-beginning) (region-end)))
-           (delete-region (region-beginning) (region-end))
-           (deactivate-mark))
-         (when header (insert "#+HEADER: " header) (forward-line))
-         (insert str)
-         (org-try-structure-completion)
-         (when mod (insert mod) (forward-line))
-         (when text (insert text))))
+	 (when (region-active-p)
+	   (setq text (buffer-substring (region-beginning) (region-end)))
+	   (delete-region (region-beginning) (region-end))
+	   (deactivate-mark))
+	 (when header (insert "#+HEADER: " header) (forward-line))
+	 (insert str)
+	 (org-try-structure-completion)
+	 (when mod (insert mod) (forward-line))
+	 (when text (insert text))))
 
      (define-key org-mode-map "<"
        (lambda () (interactive)
-         (if (or (region-active-p) (looking-back "^"))
-             (hydra-org-template/body)
-           (self-insert-command 1))))
+	 (if (or (region-active-p) (looking-back "^"))
+	     (hydra-org-template/body)
+	   (self-insert-command 1))))
 
      (eval-after-load "org"
        '(cl-pushnew
-         '("not" "#+BEGIN_NOTES\n?\n#+END_NOTES")
-         org-structure-template-alist))
+	 '("not" "#+BEGIN_NOTES\n?\n#+END_NOTES")
+	 org-structure-template-alist))
 
 
    (defhydra hydra-org-clock (:color blue :hint nil)
@@ -382,7 +422,7 @@
      ("i" org-clock-in)
      ("c" org-clock-in-last)
      ("o" org-clock-out)
-     
+
      ("e" org-clock-modify-effort-estimate)
      ("q" org-clock-cancel)
 
@@ -400,6 +440,191 @@
     ("t" org-timer-item)
     ("z" (org-info "Timers")))
 
+  (defhydra hydra-dired (:hint nil :color pink)
+    "
+  _+_ mkdir          _v_iew           _m_ark             _(_ details        _i_nsert-subdir    wdired
+  _C_opy             _O_ view other   _U_nmark all       _)_ omit-mode      _$_ hide-subdir    C-x C-q : edit
+  _D_elete           _o_pen other     _u_nmark           _l_ redisplay      _w_ kill-subdir    C-c C-c : commit
+  _R_ename           _M_ chmod        _t_oggle           _g_ revert buf     _e_ ediff          C-c ESC : abort
+  _Y_ rel symlink    _G_ chgrp        _E_xtension mark   _s_ort             _=_ pdiff
+  _S_ymlink          ^ ^              _F_ind marked      _._ toggle hydra   \\ flyspell
+  _r_sync            ^ ^              ^ ^                ^ ^                _?_ summary
+  _z_ compress-file  _A_ find regexp
+  _Z_ compress       _Q_ repl regexp
+
+  T - tag prefix
+  "
+    ("\\" dired-do-ispell)
+    ("(" dired-hide-details-mode)
+    (")" dired-omit-mode)
+    ("+" dired-create-directory)
+    ("=" diredp-ediff)         ;; smart diff
+    ("?" dired-summary)
+    ("$" diredp-hide-subdir-nomove)
+    ("A" dired-do-find-regexp)
+    ("C" dired-do-copy)        ;; Copy all marked files
+    ("D" dired-do-delete)
+    ("E" dired-mark-extension)
+    ("e" dired-ediff-files)
+    ("F" dired-do-find-marked-files)
+    ("G" dired-do-chgrp)
+    ("g" revert-buffer)        ;; read all directories again (refresh)
+    ("i" dired-maybe-insert-subdir)
+    ("l" dired-do-redisplay)   ;; relist the marked or singel directory
+    ("M" dired-do-chmod)
+    ("m" dired-mark)
+    ("O" dired-display-file)
+    ("o" dired-find-file-other-window)
+    ("Q" dired-do-find-regexp-and-replace)
+    ("R" dired-do-rename)
+    ("r" dired-do-rsynch)
+    ("S" dired-do-symlink)
+    ("s" dired-sort-toggle-or-edit)
+    ("t" dired-toggle-marks)
+    ("U" dired-unmark-all-marks)
+    ("u" dired-unmark)
+    ("v" dired-view-file)      ;; q to exit, s to search, = gets line #
+    ("w" dired-kill-subdir)
+    ("Y" dired-do-relsymlink)
+    ("z" diredp-compress-this-file)
+    ("Z" dired-do-compress)
+    ("q" nil)
+    ("." nil :color blue))
+
+  (define-key dired-mode-map "." 'hydra-dired/body)
+
+  (defhydra multiple-cursors-hydra (:hint nil)
+    "
+       ^Up^            ^Down^        ^Other^
+  ----------------------------------------------
+  [_p_]   Next    [_n_]   Next    [_l_] Edit lines
+  [_P_]   Skip    [_N_]   Skip    [_a_] Mark all
+  [_M-p_] Unmark  [_M-n_] Unmark  [_r_] Mark by regexp
+  ^ ^             ^ ^             [_q_] Quit
+  "
+    ("l" mc/edit-lines :exit t)
+    ("a" mc/mark-all-like-this :exit t)
+    ("n" mc/mark-next-like-this)
+    ("N" mc/skip-to-next-like-this)
+    ("M-n" mc/unmark-next-like-this)
+    ("p" mc/mark-previous-like-this)
+    ("P" mc/skip-to-previous-like-this)
+    ("M-p" mc/unmark-previous-like-this)
+    ("r" mc/mark-all-in-region-regexp :exit t)
+    ("q" nil))
+  (global-set-key (kbd "C-c m .") 'multiple-cursors-hydra/body)
+
+  (defhydra hydra-outline (:color pink :hint nil)
+    "
+  ^Hide^             ^Show^           ^Move
+  ^^^^^^------------------------------------------------------
+  _q_: sublevels     _a_: all         _u_: up                 
+  _t_: body          _e_: entry       _n_: next visible       
+  _o_: other         _i_: children    _p_: previous visible   
+  _c_: entry         _k_: branches    _f_: forward same level
+  _l_: leaves        _s_: subtree     _b_: backward same level
+  _d_: subtree
+
+  "
+    ;; Hide
+    ("q" hide-sublevels)    ; Hide everything but the top-level headings
+    ("t" hide-body)         ; Hide everything but headings (all body lines)
+    ("o" hide-other)        ; Hide other branches
+    ("c" hide-entry)        ; Hide this entry's body
+    ("l" hide-leaves)       ; Hide body lines in this entry and sub-entries
+    ("d" hide-subtree)      ; Hide everything in this entry and sub-entries
+    ;; Show
+    ("a" show-all)          ; Show (expand) everything
+    ("e" show-entry)        ; Show this heading's body
+    ("i" show-children)     ; Show this heading's immediate child sub-headings
+    ("k" show-branches)     ; Show all sub-headings under this heading
+    ("s" show-subtree)      ; Show (expand) everything in this heading & below
+    ;; Move
+    ("u" outline-up-heading)                ; Up
+    ("n" outline-next-visible-heading)      ; Next
+    ("p" outline-previous-visible-heading)  ; Previous
+    ("f" outline-forward-same-level)        ; Forward - same level
+    ("b" outline-backward-same-level)       ; Backward - same level
+    ("z" nil "leave"))
+
+  (define-key org-mode-map (kbd "C-.") 'hydra-outline/body)
+  (define-key Info-mode-map (kbd "h") 'Info-backward-node)    ;; h was Info-help, Info-backward-node was [
+  (define-key Info-mode-map (kbd "l") 'Info-forward-node)     ;; l was Info-history-back, Info-forward-node was ]
+  (define-key Info-mode-map (kbd "y") 'Info-help)             ;; y wasn't bound, Info-help was h
+  (define-key Info-mode-map (kbd "K") 'Info-history)          ;; K wasn't bound, Info-history was L
+  (define-key Info-mode-map (kbd "H") 'Info-history-back)     ;; H was describe-mode, Info-history-back was l
+  (define-key Info-mode-map (kbd "L") 'Info-history-forward)  ;; L was Info-history, Info-history-forward was r
+  (define-key Info-mode-map (kbd "k") 'Info-up)               ;; k wasn't bound, Info-up was ^ and u
+  (define-key Info-mode-map (kbd "j") 'Info-menu)             ;; j was bmkp-info-jump, Info-menu was m
+  (define-key Info-mode-map (kbd "b") 'bmkp-info-jump)        ;; b was beginning-of-buffer, bmkp-info-jump was j
+
+  (defhydra hydra-info (:color pink
+			:hint nil)
+    "
+  Info-mode:
+  _I_ndex(virtual)    _T_OC                            ^ ^^ ^  ^ ^ ^^     _k_/_u_p   ( )
+  _i_ndex             _t_op node        Node           _[__h_ + _l__]_      _j_/_m_enu ( ) (C-u for new window)
+  _c_opy node name    _a_propos         Top/Final Node _<__t_   ^ ^_>_      _g_oto node^^    (C-u for new window)
+  _C_lone buffer      _f_ollow          Level nxt/prev _p_^ ^   ^ ^_n_
+  _d_irectory         _b_mkp-jump       History        _H_^ ^   ^ ^_L_      _K_ History^^
+
+  _s_earch regex (_S_ case sens) ^^^^   _1_ .. _9_ Pick first .. ninth item in the node's menu.
+  "
+    ("j"   Info-menu)              ;; m
+    ("k"   Info-up)                ;; ^
+    ("m"   Info-menu)
+    ("u"   Info-up)
+
+    ("l"   Info-forward-node)
+    ("h"   Info-backward-node)
+    ("]"   Info-forward-node)
+    ("["   Info-backward-node)
+
+    ("t"   Info-top-node)
+    ("<"   Info-top-node)
+    (">"   Info-final-node)
+
+    ("n"   Info-next)
+    ("p"   Info-prev)
+
+    ("K"   Info-history)
+    ("H"   Info-history-back)
+    ("L"   Info-history-forward)
+
+    ("s"   Info-search)
+    ("S"   Info-search-case-sensitively)
+
+    ("g"   Info-goto-node)
+
+    ("f"   Info-follow-reference)
+    ("b"   bmkp-info-jump)
+    ("i"   Info-index)
+    (","   Info-index-next)
+    ("I"   Info-virtual-index)
+
+    ("T"   Info-toc)
+    ("t"   Info-top-node)
+    ("d"   Info-directory)
+    ("c"   Info-copy-current-node-name)
+    ("C"   clone-buffer)
+    ("a"   info-apropos)
+
+    ("1"   Info-nth-menu-item)
+    ("2"   Info-nth-menu-item)
+    ("3"   Info-nth-menu-item)
+    ("4"   Info-nth-menu-item)
+    ("5"   Info-nth-menu-item)
+    ("6"   Info-nth-menu-item)
+    ("7"   Info-nth-menu-item)
+    ("8"   Info-nth-menu-item)
+    ("9"   Info-nth-menu-item)
+
+    ("?"   Info-summary "Info summary")
+    ("y"   Info-help "Info help")
+    ("q"   Info-exit "Info exit" :color blue)
+    ("C-g" nil "cancel" :color blue))
+
+  (define-key Info-mode-map (kbd "C-.") #'hydra-info/body)
 #+END_SRC
 
    #+RESULTS:
@@ -421,8 +646,126 @@
 
 #+RESULTS:
 
+** projectile
+#+BEGIN_SRC emacs-lisp
+  (use-package projectile
+    :ensure t
+    :init
+    (projectile-global-mode))
+#+END_SRC
+** helm
+*** general
+#+BEGIN_SRC emacs-lisp
+  (use-package helm
+    :ensure t)
+  (require 'helm-config)
+  ;;;(global-set-key (kbd "C-x b") 'helm-buffers-list)
+  ;;;(global-set-key (kbd "C-x C-b") 'helm-buffers-list)
+  (global-set-key (kbd "C-x r b") 'helm-bookmark)
+  (global-set-key (kbd "M-x") 'helm-M-x)
+  (global-set-key (kbd "M-y") 'helm-show-kill-ring)
+  (global-set-key (kbd "C-x C-f") 'helm-find-files)
+#+END_SRC
+*** helm-projectile
+#+BEGIN_SRC emacs-lisp
+  (use-package helm-projectile
+    :ensure t)
+#+END_SRC
+*** helm-swoop
+#+BEGIN_SRC emacs-lisp
+  (use-package helm-swoop
+    :ensure t)
+#+END_SRC
+** dired
+#+BEGIN_SRC emacs-lisp
+  (use-package dired-subtree
+    :ensure t)
+  (define-key dired-mode-map (kbd ",") 'dired-subtree-toggle)
+  (use-package dired-sidebar
+    :ensure t)
+#+END_SRC
+** multiple cursors
+#+BEGIN_SRC emacs-lisp
+  (use-package multiple-cursors
+    :ensure t)
+  (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
+  (global-set-key (kbd "C->") 'mc/mark-next-like-this)
+  (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
+  (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
+#+END_SRC
+** ibuffer
+#+BEGIN_SRC emacs-lisp
+  (setq ibuffer-saved-filter-groups
+	'(("home"
+	   ("emacs-config" (or (filename . ".emacs.d")
+			       (filename . "emacs-config")))
+	   ("org" (or (mode . org-mode)
+		      (filename . "OrgMode")))
+	   ("help" (or (name . "\*Help\*"))))))
+  ;;(add-hook 'ibuffer-mode-hook
+  ;;	  '(lambda()
+  ;;	     (ibuffer-switch-to-saved-filter-groups "home")))
+
+  (use-package ibuffer-sidebar
+    :ensure t
+    :commands (ibuffer-sidebar-toggle-sidebar))
+  (use-package ibuffer-projectile
+    :ensure t
+    :init (ibuffer-projectile-set-filter-groups))
+  (add-hook 'ibuffer-hook
+	    (lambda ()
+	      (ibuffer-projectile-set-filter-groups)
+	      (unless (eq ibuffer-sorting-mode 'alphabetic)
+		(ibuffer-do-sort-by-alphabetic))))
+#+END_SRC
+
+#+END_SRC
+** undo-tree
+#+BEGIN_SRC emacs-lisp
+    (use-package undo-tree
+      :ensure t)
+    ;;turn on everywhere
+    (global-undo-tree-mode 1)
+    ;; make ctrl-z undo
+    (global-set-key (kbd "C-z") 'undo)
+    ;; make ctrl-Z redo
+    (defalias 'redo 'undo-tree-redo)
+    (global-set-key (kbd "C-S-z") 'redo)
+#+END_SRC
+** yasnippet
+#+BEGIN_SRC emacs-lisp
+  (use-package yasnippet
+    :ensure t
+    :config (yas-global-mode 1))
+  (use-package yasnippet-snippets
+    :ensure t)
+#+END_SRC
+** cider
+#+BEGIN_SRC emacs-lisp
+  (use-package cider
+    :ensure t)
+#+END_SRC
+** scheme
+#+BEGIN_SRC emacs-lisp
+  ;;; Always do syntax highlighting
+  (global-font-lock-mode 1)
+
+  ;;; Also highlight parens
+  (setq show-paren-delay 0
+	show-paren-style 'parenthesis)
+  (show-paren-mode 1)
+
+  ;;; This is the binary name of my scheme implementation
+  (setq scheme-program-name "mzscheme")
+
+#+END_SRC
 * key_bindings
 #+BEGIN_SRC emacs-lisp
+  (define-key ac-completing-map "\t" 'ac-complete)
+  (define-key ac-completing-map "\r" 'ac-stop)
+  (setq ac-use-menu-map t)
+  (define-key ac-menu-map "\C-n" 'ac-next)
+  (define-key ac-menu-map "\C-p" 'ac-previous)
 
   (with-eval-after-load 'ibuffer
     (define-key ibuffer-mode-map "." 'hydra-buffer-menu/body))
@@ -434,5 +777,7 @@
 #+END_SRC
 
 #+RESULTS:
+
 : hydra-learn-sp
+
 
