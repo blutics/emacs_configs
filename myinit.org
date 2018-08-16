@@ -1,28 +1,37 @@
 #+STARTUP: hidestars
 * interface config
+** modeline
+#+BEGIN_SRC emacs-lisp
+  (use-package telephone-line
+    :ensure t)
+  (setq telephone-line-primary-left-separator 'telephone-line-cubed-left
+        telephone-line-secondary-left-separator 'telephone-line-cubed-hollow-left
+        telephone-line-primary-right-separator 'telephone-line-cubed-right
+        telephone-line-secondary-right-separator 'telephone-line-cubed-hollow-right)
+  (setq telephone-line-height 30
+        telephone-line-evil-use-short-tag t)
+  (telephone-line-mode 1)
+#+END_SRC
 ** theme 
 #+BEGIN_SRC emacs-lisp
-  (use-package challenger-deep-theme
-    :ensure t)
-  (use-package color-theme-modern
-    :ensure t)
-  (use-package base16-theme
-    :ensure t)
-  (use-package moe-theme
-    :ensure t)
-  (use-package alect-themes
-    :ensure t)
-  (use-package zerodark-theme
-    :ensure t)
+      ;;;(use-package challenger-deep-theme :ensure t)
+      ;;;(use-package color-theme-modern :ensure t)
+      ;;;(use-package base16-theme :ensure t)
+      ;;;(use-package moe-theme :ensure t)
+      ;;;(use-package alect-themes :ensure t)
+      ;;;(use-package zerodark-theme :ensure t)
+      (use-package kaolin-themes
+        :ensure t
+        :init
+        (load-theme 'kaolin-aurora t))
+      (use-package all-the-icons
+        :ensure t)
 
-  (use-package all-the-icons
-    :ensure t)
+      ;;;(load-theme 'zerodark t)
+      ;;;(zerodark-setup-modeline-format)
 
-  (load-theme 'zerodark t)
-  (zerodark-setup-modeline-format)
-
-  ;;;(set-frame-parameter (selected-frame) 'alpha '(85 50))
-  ;;;(add-to-list 'default-frame-alist '(alpha 85 50))
+      ;;;(set-frame-parameter (selected-frame) 'alpha '(85 50))
+      ;;;(add-to-list 'default-frame-alist '(alpha 85 50))
 #+END_SRC
 
    #+RESULTS:
@@ -36,14 +45,14 @@
 #+END_SRC
 ** font
 #+BEGIN_SRC emacs-lisp
-  (set-face-attribute 'default nil :height 110 :font "Office Code Pro")
-  (set-fontset-font t 'hangul (font-spec :name "NanumGothicCoding"))
+    (set-face-attribute 'default nil :height 150 :font "Office Code Pro")
+    (set-fontset-font t 'hangul (font-spec :name "NanumGothicCoding"))
 
-  ;;;(set-language-environment "UTF-8")
-  ;;;(set-default-coding-systems 'utf-8)
+    ;;;(set-language-environment "UTF-8")
+    ;;;(set-default-coding-systems 'utf-8)
 
-  ;;;(set-fontset-font "fontset-default" '(#x1100 . #xffdc) '("MunanCoding" . "iso10646-1"))
-  ;;;(setq face-font-rescale-alist '((".*MunanCoding.*" . 1.1)))
+    ;;;(set-fontset-font "fontset-default" '(#x1100 . #xffdc) '("MunanCoding" . "iso10646-1"))
+    ;;;(setq face-font-rescale-alist '((".*MunanCoding.*" . 1.1)))
 
 #+END_SRC
 ** window size control
@@ -106,6 +115,22 @@
 =t
 ==t
 =   
+** highlight
+#+BEGIN_SRC emacs-lisp
+  (use-package highlight-numbers
+    :ensure t
+    :init
+    (add-hook 'prog-mode-hook 'highlight-numbers-mode))
+  (use-package highlight-quoted
+    :ensure t
+    :init
+    (add-hook 'prog-mode-hook 'highlight-quoted-mode))
+  (use-package highlight-operators
+    :ensure t
+    :init
+    (add-hook 'prog-mode-hook 'highlight-operators-mode))
+
+#+END_SRC
 ** for Windows Setting
 #+BEGIN_SRC emacs-lisp
   (cond
@@ -252,6 +277,20 @@
    #+RESULTS:
    | python |
 
+** java
+#+BEGIN_SRC emacs-lisp
+
+  (use-package eclim
+    :ensure t)
+  (setq eclimd-autostart t)
+  (ac-emacs-eclim-config)  
+  (custom-set-variables
+   '(eclim-eclipse-dirs '("~/java-photon/eclipse"))
+   '(eclim-executable "~/java-photon/eclipse/eclimd"))
+  (add-hook 'java-mode-hook (lambda ()
+                              (eclim-mode t)))
+
+#+END_SRC
 ** elpy
 #+BEGIN_SRC emacs-lisp
   (use-package elpy
@@ -696,15 +735,15 @@
 ** ibuffer
 #+BEGIN_SRC emacs-lisp
   (setq ibuffer-saved-filter-groups
-	'(("home"
-	   ("emacs-config" (or (filename . ".emacs.d")
-			       (filename . "emacs-config")))
-	   ("org" (or (mode . org-mode)
-		      (filename . "OrgMode")))
-	   ("help" (or (name . "\*Help\*"))))))
+        '(("home"
+           ("emacs-config" (or (filename . ".emacs.d")
+                               (filename . "emacs-config")))
+           ("org" (or (mode . org-mode)
+                      (filename . "OrgMode")))
+           ("help" (or (name . "\*Help\*"))))))
   ;;(add-hook 'ibuffer-mode-hook
-  ;;	  '(lambda()
-  ;;	     (ibuffer-switch-to-saved-filter-groups "home")))
+  ;;      '(lambda()
+  ;;         (ibuffer-switch-to-saved-filter-groups "home")))
 
   (use-package ibuffer-sidebar
     :ensure t
@@ -713,10 +752,12 @@
     :ensure t
     :init (ibuffer-projectile-set-filter-groups))
   (add-hook 'ibuffer-hook
-	    (lambda ()
-	      (ibuffer-projectile-set-filter-groups)
-	      (unless (eq ibuffer-sorting-mode 'alphabetic)
-		(ibuffer-do-sort-by-alphabetic))))
+            (lambda ()
+              (highlight-numbers-mode t)
+              (highlight-operators-mode t)
+              (ibuffer-projectile-set-filter-groups)
+              (unless (eq ibuffer-sorting-mode 'alphabetic)
+                (ibuffer-do-sort-by-alphabetic))))
 #+END_SRC
 
 #+END_SRC
