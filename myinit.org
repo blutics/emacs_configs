@@ -12,6 +12,10 @@
         telephone-line-evil-use-short-tag t)
   (telephone-line-mode 1)
 #+END_SRC
+
+#+RESULTS:
+: t
+
 ** theme 
 #+BEGIN_SRC emacs-lisp
       ;;;(use-package challenger-deep-theme :ensure t)
@@ -43,6 +47,9 @@
   (add-to-list 'default-frame-alist '(height . 30))
   (add-to-list 'default-frame-alist '(width . 80))
 #+END_SRC
+
+#+RESULTS:
+
 ** font
 #+BEGIN_SRC emacs-lisp
     (set-face-attribute 'default nil :height 150 :font "Office Code Pro")
@@ -129,8 +136,18 @@
     :ensure t
     :init
     (add-hook 'prog-mode-hook 'highlight-operators-mode))
-
+  (use-package highlight-parentheses
+    :ensure t
+    :init
+    (highlight-parentheses-mode))
+  (use-package hlinum
+    :ensure t
+    :init
+    (hlinum-activate))
 #+END_SRC
+
+#+RESULTS:
+
 ** for Windows Setting
 #+BEGIN_SRC emacs-lisp
   (cond
@@ -280,15 +297,19 @@
 ** java
 #+BEGIN_SRC emacs-lisp
 
-  (use-package eclim
-    :ensure t)
-  (setq eclimd-autostart t)
-  (ac-emacs-eclim-config)  
-  (custom-set-variables
-   '(eclim-eclipse-dirs '("~/java-photon/eclipse"))
-   '(eclim-executable "~/java-photon/eclipse/eclimd"))
-  (add-hook 'java-mode-hook (lambda ()
-                              (eclim-mode t)))
+    (use-package eclim
+      :ensure t)
+    (setq eclimd-autostart t)
+    (use-package ac-emacs-eclim
+      :ensure t
+      :init
+      (ac-emacs-eclim-config))
+    (custom-set-variables
+     '(eclim-eclipse-dirs '("~/java-photon/eclipse"))
+     '(eclim-executable "~/java-photon/eclipse/eclimd"))
+    (add-hook 'java-mode-hook (lambda ()
+                                (eclim-mode t)
+                                (flymake-mode-on t)))
 
 #+END_SRC
 ** elpy
@@ -296,11 +317,10 @@
   (use-package elpy
                :ensure t
                :init(elpy-enable))
-  (print "hello world!!!")
 #+END_SRC
 
 #+RESULTS:
-: hello world!!!
+: good night!!!
 
 ** magit
 #+BEGIN_SRC emacs-lisp
@@ -684,7 +704,7 @@
 #+END_SRC
 
 #+RESULTS:
-
+   
 ** projectile
 #+BEGIN_SRC emacs-lisp
   (use-package projectile
@@ -704,7 +724,18 @@
   (global-set-key (kbd "M-x") 'helm-M-x)
   (global-set-key (kbd "M-y") 'helm-show-kill-ring)
   (global-set-key (kbd "C-x C-f") 'helm-find-files)
+  (use-package helm-gtags
+    :ensure t)
+
+  (add-hook 'python-mode-hook 'helm-gtags-mode)
+  (use-package ac-helm
+    :ensure t)
+  (use-package helm-proc
+    :ensure t)
+  (use-package helm-pydoc
+    :ensure t)
 #+END_SRC
+#+RESULTS:
 *** helm-projectile
 #+BEGIN_SRC emacs-lisp
   (use-package helm-projectile
@@ -723,6 +754,10 @@
   (use-package dired-sidebar
     :ensure t)
 #+END_SRC
+
+#+RESULTS:
+: hello this world!!!! this looks great~~~
+
 ** multiple cursors
 #+BEGIN_SRC emacs-lisp
   (use-package multiple-cursors
@@ -813,6 +848,7 @@
   (setq ac-use-menu-map t)
   (define-key ac-menu-map "\C-n" 'ac-next)
   (define-key ac-menu-map "\C-p" 'ac-previous)
+  (define-key org-mode-map (kbd "<f5>") 'org-babel-execute-src-block)
 
   (with-eval-after-load 'ibuffer
     (define-key ibuffer-mode-map "." 'hydra-buffer-menu/body))
@@ -824,6 +860,7 @@
 #+END_SRC
 
 #+RESULTS:
+: hydra-org-clock/body
 
 : hydra-learn-sp
 
