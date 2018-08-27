@@ -29,6 +29,7 @@
  '(elim-eclipse-dirs (quote ("~/eclipse/java-latest-released/eclipse")))
  '(jdee-server-dir "~/.emacs.d/jdee-server/target")
  '(lsp-project-whitelist (quote ("^/home/blutics/koem_acc/$")))
+ '(org-agenda-files nil)
  '(package-selected-packages
    (quote
     (java-snippets java-yasnippets f dap-mode lsp-python company-slime gradle-mode mvn ant company-lsp lsp-mode realgud google-c-style autodisass-java-bytecode meghanada w3 dashboard highlight-symbol eshell-git-prompt helm-pydoc helm-proc ac-helm hlinum helm-gtags memoize dash company-emacs-eclim highlight highlight-defined highlight-numbers highlight-operators highlight-parentheses highlight-quoted cider yasnippet-snippets undo-tree ibuffer-projectile ibuffer-sidebar multiple-cursors dired-sidebar dired-subtree helm-swoop helm-projectile helm projectile move-text hydra elpy neotree auto-complete counsel ace-window which-key try paredit beacon hungry-delete expand-region flx-ido zerodark-theme use-package moe-theme color-theme-modern challenger-deep-theme base16-theme alect-themes))))

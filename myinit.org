@@ -53,7 +53,7 @@
 #+END_SRC
 ** window size control
 #+BEGIN_SRC emacs-lisp
-  (global-set-key (kbd "S-C-<left>") 'shrink-window-horizontally)
+  (global-set-key (kbd "S-C-<left>") 'shrink-window-horizontallqy)
   (global-set-key (kbd "S-C-<right>") 'enlarge-window-horizontally)
   (global-set-key (kbd "S-C-<down>") 'shrink-window)
   (global-set-key (kbd "S-C-<up>") 'enlarge-window)
@@ -146,7 +146,7 @@
   #+END_SRC
 
 #+RESULTS:
-
+   
 ** highlight
 #+BEGIN_SRC emacs-lisp
   (use-package highlight-numbers
@@ -197,7 +197,6 @@
 #+END_SRC
 
 #+RESULTS:
-   
 * packages
 ** try
 #+BEGIN_SRC emacs-lisp
@@ -410,7 +409,6 @@
 #+END_SRC
 
    #+RESULTS:
-
 ** hydra
 #+BEGIN_SRC emacs-lisp
    (use-package hydra
@@ -445,140 +443,6 @@
      ("v" Buffer-menu-select "select" :color blue)
      ("o" Buffer-menu-other-window "other-window" :color blue)
      ("q" quit-window "quit" :color blue))
-
-
-
-   (defun org-agenda-cts ()
-     (and (eq major-mode 'org-agenda-mode)
-	  (let ((args (get-text-property
-		       (min (1- (point-max)) (point))
-		       'org-last-args)))
-	    (nth 2 args))))
-
-   (defhydra hydra-org-agenda-view (:hint none)
-     "
-   _d_: ?d? day        _g_: time grid=?g?  _a_: arch-trees
-   _w_: ?w? week       _[_: inactive       _A_: arch-files
-   _t_: ?t? fortnight  _f_: follow=?f?     _r_: clock report=?r?
-   _m_: ?m? month      _e_: entry text=?e? _D_: include diary=?D?
-   _y_: ?y? year       _._: quit           _L__l__c_: log = ?l?"
-     ("SPC" org-agenda-reset-view)
-     ("d" org-agenda-day-view (if (eq 'day (org-agenda-cts)) "[x]" "[ ]"))
-     ("w" org-agenda-week-view (if (eq 'week (org-agenda-cts)) "[x]" "[ ]"))
-     ("t" org-agenda-fortnight-view (if (eq 'fortnight (org-agenda-cts)) "[x]" "[ ]"))
-     ("m" org-agenda-month-view (if (eq 'month (org-agenda-cts)) "[x]" "[ ]"))
-     ("y" org-agenda-year-view (if (eq 'year (org-agenda-cts)) "[x]" "[ ]"))
-     ("l" org-agenda-log-mode (format "% -3S" org-agenda-show-log))
-     ("L" (org-agenda-log-mode '(4)))
-     ("c" (org-agenda-log-mode 'clockcheck))
-     ("f" org-agenda-follow-mode (format "% -3S" org-agenda-follow-mode))
-     ("a" org-agenda-archives-mode)
-     ("A" (org-agenda-archives-mode 'files))
-     ("r" org-agenda-clockreport-mode (format "% -3S" org-agenda-clockreport-mode))
-     ("e" org-agenda-entry-text-mode (format "% -3S" org-agenda-entry-text-mode))
-     ("g" org-agenda-toggle-time-grid (format "% -3S" org-agenda-use-time-grid))
-     ("D" org-agenda-toggle-diary (format "% -3S" org-agenda-include-diary))
-     ("!" org-agenda-toggle-deadlines)
-     ("[" (let ((org-agenda-include-inactive-timestamps t))
-	    (org-agenda-check-type t 'timeline 'agenda)
-	    (org-agenda-redo)
-	    (message "Display now includes inactive timestamps as well")))
-     ("q" (message "Abort") :exit t)
-     ("." nil))
-
-   ;; Recommended binding:
-
-
-     (defhydra hydra-org-template (:color blue :hint nil)
-       "
-  _c_ :  center  _q_ :  quote     _e_ :  emacs-lisp    _L_ :  LaTeX:
-  _l_ :  latex   _E_ :  Example   _p_ :  perl          _i_ :  index:
-  _a_ :  ascii   _v_ :  verse     _P_ :  Perl tangled  _I_ :  INCLUDE:
-  _s_ :  src     _n_ :  note      _u_ :  plant uml     _H_ :  HTML:
-  _h_ :  html    _A_ :  ASCII:    _S_ :  seq_TODO
-
-   "
-       ("s" (hot-expand "<s"))
-       ("E" (hot-expand "<e"))
-       ("q" (hot-expand "<q"))
-       ("v" (hot-expand "<v"))
-       ("n" (hot-expand "<not"))
-       ("c" (hot-expand "<c"))
-       ("l" (hot-expand "<l"))
-       ("h" (hot-expand "<h"))
-       ("a" (hot-expand "<a"))
-       ("L" (hot-expand "<L"))
-       ("i" (hot-expand "<i"))
-       ("e" (hot-expand "<s" "emacs-lisp"))
-       ("p" (hot-expand "<s" "perl"))
-       ("u" (hot-expand "<s" "plantuml :file CHANGE.png"))
-       ("P" (hot-expand "<s" "perl" ":results output :exports both :shebang \"#!/usr/bin/env perl\"\n"))
-       ("I" (hot-expand "<I"))
-       ("H" (hot-expand "<H"))
-       ("S" (hot-expand "<S"))
-       ("A" (hot-expand "<A"))
-       ("<" self-insert-command "ins")
-       ("o" nil "quit"))
-
-     (defun hot-expand (str &optional mod header)
-       "Expand org template.
-
-   STR is a structure template string recognised by org like <s. MOD is a
-   string with additional parameters to add the begin line of the
-   structure element. HEADER string includes more parameters that are
-   prepended to the element after the #+HEADER: tag."
-       (let (text)
-	 (when (region-active-p)
-	   (setq text (buffer-substring (region-beginning) (region-end)))
-	   (delete-region (region-beginning) (region-end))
-	   (deactivate-mark))
-	 (when header (insert "#+HEADER: " header) (forward-line))
-	 (insert str)
-	 (org-try-structure-completion)
-	 (when mod (insert mod) (forward-line))
-	 (when text (insert text))))
-
-     (define-key org-mode-map "<"
-       (lambda () (interactive)
-	 (if (or (region-active-p) (looking-back "^"))
-	     (hydra-org-template/body)
-	   (self-insert-command 1))))
-
-     (eval-after-load "org"
-       '(cl-pushnew
-	 '("not" "#+BEGIN_NOTES\n?\n#+END_NOTES")
-	 org-structure-template-alist))
-
-
-   (defhydra hydra-org-clock (:color blue :hint nil)
-     "
-  ^Clock:^ ^In/out^     ^Edit^   ^Summary^    | ^Timers:^ ^Run^           ^Insert
-  -^-^-----^-^----------^-^------^-^----------|--^-^------^-^-------------^------
-  (_?_)    _i_n         _e_dit   _g_oto entry | (_z_)     _r_elative      ti_m_e
-   ^ ^     _c_ontinue   _q_uit   _d_isplay    |  ^ ^      cou_n_tdown     i_t_em
-   ^ ^     _o_ut        ^ ^      _r_eport     |  ^ ^      _p_ause toggle
-   ^ ^     ^ ^          ^ ^      ^ ^          |  ^ ^      _s_top
-  "
-     ("i" org-clock-in)
-     ("c" org-clock-in-last)
-     ("o" org-clock-out)
-
-     ("e" org-clock-modify-effort-estimate)
-     ("q" org-clock-cancel)
-
-     ("g" org-clock-goto)
-     ("d" org-clock-display)
-     ("r" org-clock-report)
-     ("?" (org-info "Clocking commands"))
-
-    ("r" org-timer-start)
-    ("n" org-timer-set-timer)
-    ("p" org-timer-pause-or-continue)
-    ("s" org-timer-stop)
-
-    ("m" org-timer)
-    ("t" org-timer-item)
-    ("z" (org-info "Timers")))
 
   (defhydra hydra-dired (:hint nil :color pink)
     "
@@ -785,9 +649,9 @@
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'org-structure-template-alist
                '("S" "#+SEQ_TODO: "))
+  (add-hook 'org-mode-hook (lambda ()(setq org-agenda-files (file-expand-wildcards "~/org-sample/*.org"))))
 #+END_SRC
 #+RESULTS:
-
 ** projectile
 #+BEGIN_SRC emacs-lisp
   (use-package projectile
@@ -951,18 +815,13 @@
 
   (global-set-key (kbd "<f12>") 'swiper-all)
   (define-key org-mode-map (kbd "<f5>") 'org-babel-execute-src-block)
+  (define-key org-mode-map (kbd "C-c a") 'org-agenda-execute)
 
   (with-eval-after-load 'ibuffer
     (define-key ibuffer-mode-map "." 'hydra-buffer-menu/body))
-  (with-eval-after-load 'org-agenda
-    (define-key org-agenda-mode-map "." 'hydra-org-agenda-view/body))
-  (with-eval-after-load 'org
-    (bind-key "C-c w" 'hydra-org-clock/body))
+
 #+END_SRC
 
 #+RESULTS:
 : hydra-org-clock/body
-
-: hydra-learn-sp
-
 
