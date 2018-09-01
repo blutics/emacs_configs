@@ -47,7 +47,7 @@
 ** font
 #+BEGIN_SRC emacs-lisp
   ;;; necessary fonts : Office Code Pro / NanumGothincCoding
-  (set-face-attribute 'default nil :height 150 :font "Office Code Pro")
+  (set-face-attribute 'default nil :height 150 :font "NanumGothicCoding")
   (set-fontset-font t 'hangul (font-spec :name "NanumGothicCoding"))
 
 #+END_SRC
@@ -78,6 +78,8 @@
   (flx-ido-mode 1)
   (setq ido-use-faces nil)
 
+  (setq default-input-method "korean-hangul")
+  (setq compilation-scroll-output t)
 
 
   (setq linum-format "%5d ")
@@ -114,11 +116,11 @@
 
   (defun my-at-expression-paredit-space-for-delimiter-predicate (endp delimiter)
     (if (and (member major-mode '(python-mode))
-             (not endp))
-        (not (or (and (memq delimiter '(?\[ ?\{ ?\()))))
+	     (not endp))
+	(not (or (and (memq delimiter '(?\[ ?\{ ?\()))))
       t))
   (add-hook 'paredit-space-for-delimiter-predicates
-            #'my-at-expression-paredit-space-for-delimiter-predicate)
+	    #'my-at-expression-paredit-space-for-delimiter-predicate)
 
 
   (global-set-key (kbd "C-c b") 'switch-to-prev-buffer)
@@ -136,10 +138,10 @@
   ;; banner could be ascii banner, but with other functions!!!!
   ;; function : dashboard-insert-ascii-banner-centered
   (setq dashboard-items '((recents  . 5)
-                          ;;;(bookmarks . 5)
-                          (projects . 5)
-                          ;;;(agenda . 5)
-                          (registers . 5)))
+			  ;;;(bookmarks . 5)
+			  (projects . 5)
+			  ;;;(agenda . 5)
+			  (registers . 5)))
 
   ;; it looks goood, but not neaty
   ;;(toggle-indicate-empty-lines)
@@ -350,13 +352,13 @@
 #+BEGIN_SRC emacs-lisp
   ;; Add color formatting to *compilation* buffer
   (add-hook 'compilation-filter-hook
-            (lambda () (ansi-color-apply-on-region (point-min) (point-max))))
+	    (lambda () (ansi-color-apply-on-region (point-min) (point-max))))
 
   (use-package lsp-mode
     :ensure t
     :init (setq lsp-inhibit-message t
-                lsp-eldoc-render-all nil
-                lsp-highlight-symbol-at-point nil))
+		lsp-eldoc-render-all nil
+		lsp-highlight-symbol-at-point nil))
 
   (use-package company-lsp
     :after  company
@@ -369,10 +371,10 @@
     :ensure t
     :config
     (setq lsp-ui-sideline-enable t
-          lsp-ui-sideline-show-symbol nil
-          lsp-ui-sideline-show-hover nil
-          lsp-ui-sideline-show-code-actions t
-          lsp-ui-sideline-update-mode 'point)
+	  lsp-ui-sideline-show-symbol nil
+	  lsp-ui-sideline-show-hover nil
+	  lsp-ui-sideline-show-code-actions t
+	  lsp-ui-sideline-update-mode 'point)
     )
 
   (use-package lsp-java
@@ -386,6 +388,12 @@
     (add-hook 'java-mode-hook  'lsp-ui-sideline-mode)
     (setq lsp-java--workspace-folders (list "~/workspace/")))
 
+  (use-package dap-mode
+    :ensure t)
+
+  (add-to-list 'lsp-java-bundles (expand-file-name
+				  (locate-user-emacs-file
+				   "eclipse.jdt.ls/plugins/com.microsoft.java.debug.plugin-0.10.0.jar")))
 
 #+END_SRC
 
@@ -791,23 +799,6 @@
     (with-eval-after-load 'scheme
         (define-key scheme-mode-map (kbd "<f5>") 'my/run-scheme))
 #+END_SRC
-** dap
-#+BEGIN_SRC emacs-lisp
-  (use-package f
-    :ensure t)
-  (use-package tree-mode
-    :ensure t)
-  (use-package bui
-    :ensure t)
-  (load-file ".emacs.d/dap-mode/dap-overlays.el")
-  (load-file ".emacs.d/dap-mode/dap-mode.el")
-  (load-file ".emacs.d/dap-mode/dap-python.el")
-  (load-file ".emacs.d/dap-mode/dap-java.el")
-  (load-file ".emacs.d/dap-mode/dap-ui.el")
-  (load-file ".emacs.d/dap-mode/dap-ui-repl.el")
-  (add-to-list 'lsp-java-bundles (expand-file-name
-                                  (locate-user-emacs-file
-                                   "eclipse.jdt.ls/plugins/com.microsoft.java.debug.plugin-0.10.0.jar")))
 #+END_SRC
 * key_bindings
 #+BEGIN_SRC emacs-lisp
