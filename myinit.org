@@ -47,10 +47,13 @@
 ** font
 #+BEGIN_SRC emacs-lisp
   ;;; necessary fonts : Office Code Pro / NanumGothincCoding
-  (set-face-attribute 'default nil :height 150 :font "NanumGothicCoding")
-  (set-fontset-font t 'hangul (font-spec :name "NanumGothicCoding"))
+  (set-face-attribute 'default nil :height 150 :font "D2Coding")
+  (set-fontset-font t 'hangul (font-spec :name "D2Coding"))
 
 #+END_SRC
+
+#+RESULTS:
+
 ** window size control
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "S-C-<left>") 'shrink-window-horizontallqy)
@@ -78,9 +81,13 @@
   (flx-ido-mode 1)
   (setq ido-use-faces nil)
 
+  (set-language-environment "Korean")
+  (prefer-coding-system 'utf-8)
   (setq default-input-method "korean-hangul")
-  (setq compilation-scroll-output t)
+  (global-set-key (kbd "<Hangul>") 'toggle-input-method)
 
+
+  (setq compilation-scroll-output t)
 
   (setq linum-format "%5d ")
   (global-hl-line-mode)
@@ -148,6 +155,7 @@
   #+END_SRC
 
 #+RESULTS:
+: ((recents . 5) (projects . 5) (registers . 5))
    
 ** highlight
 #+BEGIN_SRC emacs-lisp
@@ -398,7 +406,7 @@
 #+END_SRC
 
 #+RESULTS:
-| helm-gtags-mode | elpy-mode | er/add-python-mode-expansions | lsp-python-enable |
+| /home/blutics/.emacs.d/eclipse.jdt.ls/plugins/com.microsoft.java.debug.plugin-0.10.0.jar |
 
 ** elpy
 #+BEGIN_SRC emacs-lisp
