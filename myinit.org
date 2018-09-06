@@ -47,13 +47,10 @@
 ** font
 #+BEGIN_SRC emacs-lisp
   ;;; necessary fonts : Office Code Pro / NanumGothincCoding
-  (set-face-attribute 'default nil :height 150 :font "D2Coding")
-  (set-fontset-font t 'hangul (font-spec :name "D2Coding"))
+  (set-face-attribute 'default nil :height 150 :font "NanumGothicCoding")
+  (set-fontset-font t 'hangul (font-spec :name "NanumGothicCoding"))
 
 #+END_SRC
-
-#+RESULTS:
-
 ** window size control
 #+BEGIN_SRC emacs-lisp
   (global-set-key (kbd "S-C-<left>") 'shrink-window-horizontallqy)
@@ -152,10 +149,14 @@
 
   ;; it looks goood, but not neaty
   ;;(toggle-indicate-empty-lines)
+
+  (global-set-key (kbd "M-z") 'zap-up-to-char)
+
+  ;;(use-package smooth-scrolling :ensure t)
   #+END_SRC
 
 #+RESULTS:
-: ((recents . 5) (projects . 5) (registers . 5))
+: zap-up-to-char
    
 ** highlight
 #+BEGIN_SRC emacs-lisp
@@ -269,9 +270,14 @@
 ** avy
 #+BEGIN_SRC emacs-lisp
   (use-package avy
-    :ensure t
-    :bind ("M-s" . avy-goto-char))
+    :ensure t)
+  (global-set-key (kbd "C-;") 'avy-goto-char)
+  (global-set-key (kbd "C-'") 'avy-goto-char-2)
 #+END_SRC
+
+#+RESULTS:
+: avy-goto-char-2
+
 ** auto-complete
 ** flycheck
 #+BEGIN_SRC emacs-lisp
@@ -279,10 +285,17 @@
     :ensure t
     :init
     (global-flycheck-mode))
-  (setq flycheck-indication-mode nil)
+  (use-package flycheck-irony
+    :ensure t)
+  (use-package flycheck-color-mode-line
+    :ensure t)
+  (use-package avy-flycheck
+    :ensure)
+  (global-set-key (kbd "C-c C-j") 'avy-flycheck-goto-error)
 #+END_SRC
 
    #+RESULTS:
+   : avy-flycheck-goto-error
 ** company
 #+BEGIN_SRC emacs-lisp
   (use-package company
@@ -334,34 +347,8 @@
 
    #+RESULTS:
    | my/neotree-hook |
-** python
+** lsp-mode
 #+BEGIN_SRC emacs-lisp
-  ;;;(setq python-shell-interpreter "python3")
-  (setq python-shell-completion-native-disabled-interpreters '("python"))     
-  (use-package company-jedi
-    :ensure t)
-  (use-package lsp-python
-    :ensure t)
-  (add-hook 'python-mode-hook 'lsp-python-enable)
-  (lsp-define-stdio-client lsp-python "python"
-                           (lsp-make-traverser #'(lambda (dir)
-                                                   (directory-files
-                                                    dir
-                                                    nil
-                                                    ".git")))
-                           '("pyls"))
-
-#+END_SRC
-
-   #+RESULTS:
-   : t
-
-** java
-#+BEGIN_SRC emacs-lisp
-  ;; Add color formatting to *compilation* buffer
-  (add-hook 'compilation-filter-hook
-	    (lambda () (ansi-color-apply-on-region (point-min) (point-max))))
-
   (use-package lsp-mode
     :ensure t
     :init (setq lsp-inhibit-message t
@@ -385,6 +372,55 @@
 	  lsp-ui-sideline-update-mode 'point)
     )
 
+#+END_SRC
+** C/C++
+#+BEGIN_SRC emacs-lisp
+  (use-package irony
+    :ensure t)
+  (add-hook 'c++-mode-hook 'irony-mode)
+  (add-hook 'c-mode-hook 'irony-mode)
+  (add-hook 'objc-mode-hook 'irony-mode)
+  (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
+
+  (use-package company-irony
+    :ensure t)
+  (eval-after-load 'company
+    '(add-to-list 'company-backends 'company-irony))
+  (use-package company-irony-c-headers
+    :ensure t)
+  (eval-after-load 'company
+    '(add-to-list
+      'company-backends '(company-irony-c-headers company-irony)))
+#+END_SRC
+
+#+RESULTS:
+| er/add-cc-mode-expansions | lsp-clangd-objc-enable |
+
+** python
+#+BEGIN_SRC emacs-lisp
+  (setq python-shell-interpreter "python3")
+  (setq python-shell-completion-native-disabled-interpreters '("python"))     
+  (use-package company-jedi
+    :ensure t)
+  (defun my/python-mode-hook ()
+    (add-to-list 'company-backends 'company-jedi))
+
+  (add-hook 'python-mode-hook 'my/python-mode-hook)
+  (use-package python-mode
+    :ensure t)
+
+#+END_SRC
+
+   #+RESULTS:
+   : lsp-python-enable
+
+** java
+#+BEGIN_SRC emacs-lisp
+  ;; Add color formatting to *compilation* buffer
+  (add-hook 'compilation-filter-hook
+	    (lambda () (ansi-color-apply-on-region (point-min) (point-max))))
+
+
   (use-package lsp-java
     :ensure t
     :requires (lsp-ui-flycheck lsp-ui-sideline)
@@ -403,10 +439,16 @@
 				  (locate-user-emacs-file
 				   "eclipse.jdt.ls/plugins/com.microsoft.java.debug.plugin-0.10.0.jar")))
 
+  (use-package mvn
+    :ensure t)
+
+  ;; Add color formatting to *compilation* buffer
+  (add-hook 'compilation-filter-hook
+    (lambda () (ansi-color-apply-on-region (point-min) (point-max))))
 #+END_SRC
 
 #+RESULTS:
-| /home/blutics/.emacs.d/eclipse.jdt.ls/plugins/com.microsoft.java.debug.plugin-0.10.0.jar |
+| lambda | nil | (ansi-color-apply-on-region (point-min) (point-max)) |
 
 ** elpy
 #+BEGIN_SRC emacs-lisp
@@ -690,7 +732,17 @@
 
   (use-package helm-gtags
     :ensure t)
-  (add-hook 'python-mode-hook 'helm-gtags-mode)
+  (add-hook 'prog-mode-hook 'helm-gtags-mode)
+
+  (custom-set-variables
+   '(helm-gtags-path-style 'relative)
+   ;;'(helm-gtags-ignore-case t)
+   '(helm-gtags-auto-update t))
+
+  (define-key helm-gtags-mode-map (kbd "S-C-s") 'helm-gtags-select)
+  (define-key helm-gtags-mode-map (kbd "C-c C-i") 'helm-gtags-dwim)
+  (define-key helm-gtags-mode-map (kbd "C-c C-,") 'helm-gtags-previous-history)
+  (define-key helm-gtags-mode-map (kbd "C-c C-.") 'helm-gtags-next-history)
 
   (use-package helm-proc
     :ensure t)
@@ -715,6 +767,23 @@
   (define-key dired-mode-map (kbd ",") 'dired-subtree-toggle)
   (use-package dired-sidebar
     :ensure t)
+  (use-package dired-avfs
+    :ensure t)
+  (use-package dired-open
+    :ensure t)
+  (use-package dired-rainbow
+    :ensure t)
+  (use-package dired-k
+    :ensure t)
+  (use-package dired-efap
+    :ensure t)
+  (use-package dired-ranger
+    :ensure t)
+  (use-package dired-rsync
+    :ensure t)
+  (use-package dired-recent
+    :ensure t)
+
 #+END_SRC
 
 #+RESULTS:
@@ -818,9 +887,9 @@
 
   (with-eval-after-load 'ibuffer
     (define-key ibuffer-mode-map "." 'hydra-buffer-menu/body))
-
+  
 #+END_SRC
 
 #+RESULTS:
-: hydra-org-clock/body
+: pygments
 
