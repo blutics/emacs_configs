@@ -81,7 +81,6 @@
   (set-language-environment "Korean")
   (prefer-coding-system 'utf-8)
   (setq default-input-method "korean-hangul")
-  (global-set-key (kbd "<Hangul>") 'toggle-input-method)
 
 
   (setq compilation-scroll-output t)
@@ -216,6 +215,11 @@
 #+END_SRC
 
 #+RESULTS:
+** auto-update-packages
+#+BEGIN_SRC emacs-lisp
+  (use-package auto-package-update
+    :ensure t)
+#+END_SRC
 
 ** which-key
 #+BEGIN_SRC emacs-lisp
@@ -420,31 +424,6 @@
   (add-hook 'compilation-filter-hook
 	    (lambda () (ansi-color-apply-on-region (point-min) (point-max))))
 
-
-  (use-package lsp-java
-    :ensure t
-    :requires (lsp-ui-flycheck lsp-ui-sideline)
-    :config
-    (add-hook 'java-mode-hook  'lsp-java-enable)
-    (add-hook 'java-mode-hook  'flycheck-mode)
-    (add-hook 'java-mode-hook  'company-mode)
-    (add-hook 'java-mode-hook  (lambda () (lsp-ui-flycheck-enable t)))
-    (add-hook 'java-mode-hook  'lsp-ui-sideline-mode)
-    (setq lsp-java--workspace-folders (list "~/workspace/")))
-
-  (use-package dap-mode
-    :ensure t)
-
-  (add-to-list 'lsp-java-bundles (expand-file-name
-				  (locate-user-emacs-file
-				   "eclipse.jdt.ls/plugins/com.microsoft.java.debug.plugin-0.10.0.jar")))
-
-  (use-package mvn
-    :ensure t)
-
-  ;; Add color formatting to *compilation* buffer
-  (add-hook 'compilation-filter-hook
-    (lambda () (ansi-color-apply-on-region (point-min) (point-max))))
 #+END_SRC
 
 #+RESULTS:
@@ -462,8 +441,10 @@
 
 ** magit
 #+BEGIN_SRC emacs-lisp
-     (use-package magit
-       :ensure t)
+  (use-package graphql
+    :ensure t)
+  (use-package magit
+    :ensure t)
 #+END_SRC
 
    #+RESULTS:
